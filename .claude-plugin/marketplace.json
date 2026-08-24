@@ -1,0 +1,13 @@
+{
+  "name": "helix",
+  "owner": {
+    "name": "mutsuki14"
+  },
+  "plugins": [
+    {
+      "name": "helix",
+      "source": "./",
+      "description": "Helix Method Loop — zero-config engineering discipline: clarify → seed → build → verify → evolve, with deterministic ambiguity/drift/loop gates."
+    }
+  ]
+}
