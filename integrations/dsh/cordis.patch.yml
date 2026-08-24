@@ -1,0 +1,6 @@
+# dsh-helix bundle layer: mounts the Helix skill installer plugin.
+# Referenced by package name so Node resolution finds the installed package.
+- insert:
+    - id: helix
+      name: dsh-helix
+      failOnStartupError: false

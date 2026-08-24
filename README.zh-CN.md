@@ -32,6 +32,14 @@ git clone https://github.com/mutsuki14/helix.git
 cp -r helix/skills/helix ~/.claude/skills/helix
 ```
 
+**DeepSeek Harness（dsh）**
+
+```bash
+dsh plugin --profile <your-profile> add "github:mutsuki14/helix#main&path:integrations/dsh"
+```
+
+随包 Cordis 插件会在启动时把技能幂等同步到 `~/.agents/skills/helix`（细节见 [integrations/dsh](./integrations/dsh)）。dsh 原生读共享技能根，下面的直接复制方式同样有效。
+
 **Codex CLI / OpenCode / 使用共享技能根的宿主**
 
 ```bash

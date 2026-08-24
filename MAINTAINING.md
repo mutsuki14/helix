@@ -6,7 +6,8 @@ Helix 以三种形态分发，**任何内容更新必须三处同步**，版本�
 |---|---|---|
 | Cindy 插件源码 | [mutsuki14/cindy-plugins](https://github.com/mutsuki14/cindy-plugins) 的 `helix/` | bump `ghost.json` version → `ghost_forge_pack` 重新打包装入 |
 | 跨宿主技能包 | 本仓库 `skills/helix/` | 同步 `SKILL.md` / `methods/` / `scripts/gate.mjs`，bump `.claude-plugin/plugin.json` version |
-| 已装入实例 | 用户各宿主 | Cindy 走更新确认框；技能目录重新拷贝 |
+| dsh 插件 | 本仓库 `integrations/dsh/` | 改过 `skills/helix` 后运行 `node scripts/sync-dsh.mjs` 重新生成 `skill/` 副本，bump `integrations/dsh/package.json` version |
+| 已装入实例 | 用户各宿主 | Cindy 走更新确认框；技能目录重新拷贝；dsh 走 `dsh plugin update` |
 
 内容转换规则（Cindy 手册 → 本仓库 methods/）：
 

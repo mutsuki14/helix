@@ -32,6 +32,14 @@ git clone https://github.com/mutsuki14/helix.git
 cp -r helix/skills/helix ~/.claude/skills/helix
 ```
 
+**DeepSeek Harness (dsh)**
+
+```bash
+dsh plugin --profile <your-profile> add "github:mutsuki14/helix#main&path:integrations/dsh"
+```
+
+The bundled Cordis plugin idempotently syncs the skill into `~/.agents/skills/helix` on startup (details: [integrations/dsh](./integrations/dsh)). Since dsh natively reads the shared skills root, the plain copy below works too.
+
 **Codex CLI / OpenCode / hosts using the shared skills root**
 
 ```bash
