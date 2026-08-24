@@ -59,7 +59,7 @@ mkdir -p ~/.agents/skills && cp -r helix/skills/helix ~/.agents/skills/helix
 
 **通用安装提示词**——把这段话发给任何有能力的 Agent：
 
-> 克隆 https://github.com/mutsuki14/helix，识别你所在的 Agent 宿主，把 `skills/helix` 文件夹装到该宿主发现技能的位置（或把 SKILL.md 接入我的全局 Agent 指令），装完告诉我装到了哪里。
+> 克隆 https://github.com/mutsuki14/helix， 识别你所在的 Agent 宿主，把 `skills/helix` 文件夹装到该宿主发现技能的位置（或把 SKILL.md 接入我的全局 Agent 指令），装完告诉我装到了哪里。
 
 **Cindy** —— 请改用 [mutsuki14/cindy-plugins](https://github.com/mutsuki14/cindy-plugins) 里的插件版（同一套方法论，原生 `ghost_manual`/`helix_gate` 集成）。同一宿主不要两个都装。
 
