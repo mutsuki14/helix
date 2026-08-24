@@ -64,6 +64,7 @@ Helix 是一套工程方法环，融合两条血统，并以第三方生态之�
 | 文件 | 内容 | 何时读 |
 |---|---|---|
 | `personas.md` | 九人格 + 派发即用提示词 + 无子代理回退协议 | 派评审/脱困/访谈子代理前 |
+| `domains.md` | 领域专家人格（迁移/并发/安全/性能/前端）+ 触发映射 | 改动命中特定领域的共识门/评审 |
 | `clarify.md` | 苏格拉底访谈、歧义门、Seed 结晶 | L2 开工前；`helix seed` |
 | `templates.md` | Seed 模板库（bugfix/feature/refactor/migration） | 结晶 Seed 时快速起步 |
 | `grill.md` | 压力测试协议 + 文档评审提示词 | `helix grill`、审问计划 |

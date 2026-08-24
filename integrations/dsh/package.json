@@ -1,6 +1,6 @@
 {
   "name": "dsh-helix",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Helix Method Loop for DeepSeek Harness — installs the Helix engineering-discipline skill (clarify → seed → build → verify → evolve with deterministic gates) into the shared agent skills root on startup. Zero-config: no API keys, no daemons.",
   "type": "module",
   "main": "index.js",
