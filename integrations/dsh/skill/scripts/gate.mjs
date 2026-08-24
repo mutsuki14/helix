@@ -126,6 +126,100 @@ if (args.mode === 'ambiguity') {
     loops_used: loopsUsed, loops_remaining: Math.max(0, maxLoops - loopsUsed),
     history
   });
+} else if (args.mode === 'receipt') {
+  const checks = args.checks;
+  const okScopes = ['target', 'regression', 'other'];
+  if (!Array.isArray(checks) || checks.length < 1 || checks.some((c) =>
+    !c || typeof c.name !== 'string' || !Number.isInteger(c.exit_code) ||
+    typeof c.fresh !== 'boolean' || !okScopes.includes(c.scope))) {
+    fail('receipt 模式需要 checks(非空数组,每项 {name, exit_code, fresh, scope: target|regression|other})');
+  }
+  const uncovered = Array.isArray(args.uncovered) ? args.uncovered.filter((u) => typeof u === 'string') : [];
+  const failed = checks.filter((c) => c.exit_code !== 0).map((c) => c.name);
+  const stale = checks.filter((c) => c.fresh !== true).map((c) => c.name);
+  const hasTarget = checks.some((c) => c.scope === 'target' && c.exit_code === 0 && c.fresh === true);
+  const hasRegression = checks.some((c) => c.scope === 'regression' && c.exit_code === 0 && c.fresh === true);
+  let grade, reason;
+  if (failed.length || stale.length) {
+    grade = 'C';
+    reason = `存在失败或不新鲜的检查（失败: ${failed.join(', ') || '无'}；不新鲜: ${stale.join(', ') || '无'}）`;
+  } else if (!hasTarget) {
+    grade = 'C';
+    reason = '没有直接针对目标的新鲜证据（scope=target）';
+  } else if (hasRegression && uncovered.length === 0) {
+    grade = 'A';
+    reason = '目标证据 + 回归证据齐全，无已知未覆盖面';
+  } else {
+    grade = 'B';
+    reason = hasRegression ? `有未覆盖面: ${uncovered.join('; ')}` : '缺回归证据' + (uncovered.length ? `；未覆盖: ${uncovered.join('; ')}` : '');
+  }
+  out({
+    gate: 'receipt', grade, reason,
+    claim_allowed: grade !== 'C',
+    failed, stale, uncovered,
+    verdict: grade === 'C'
+      ? '置信 C：不得宣称"完成"——改说"实现了 X，尚未验证 Y"，或补齐检查后重新评级。'
+      : `置信 ${grade}：可以宣称完成${grade === 'B' ? '，但收据必须列出残余风险' : ''}。等级由工具按原始事实判定，不要手改。`
+  });
+} else if (args.mode === 'calibrate') {
+  const records = args.records;
+  if (!Array.isArray(records) || records.some((r) =>
+    !r || typeof r.ambiguity !== 'number' || r.ambiguity < 0 || r.ambiguity > 1 ||
+    !Number.isInteger(r.loops) || r.loops < 1)) {
+    fail('calibrate 模式需要 records(数组,每项 {ambiguity: 0–1, loops: ≥1 整数, drift?: 0–1})');
+  }
+  const n = records.length;
+  const mean = (xs) => (xs.length ? round(xs.reduce((a, b) => a + b, 0) / xs.length) : null);
+  const high = records.filter((r) => r.loops >= 3);
+  const low = records.filter((r) => r.loops <= 1);
+  const drifts = records.map((r) => r.drift).filter((d) => typeof d === 'number');
+  const stats = {
+    n,
+    high_rework: { count: high.length, mean_ambiguity: mean(high.map((r) => r.ambiguity)) },
+    low_rework: { count: low.length, mean_ambiguity: mean(low.map((r) => r.ambiguity)) },
+    mean_drift: mean(drifts)
+  };
+  let recommendation;
+  if (n < 5) {
+    recommendation = `样本不足（${n}/5）：继续在每次 retro 时追加校准记录，暂不调门槛。`;
+  } else if (high.length < 3) {
+    recommendation = '高返工（≥3 圈）样本不足 3 条：当前歧义门表现尚可，维持默认门槛。';
+  } else if (stats.high_rework.mean_ambiguity <= 0.2) {
+    const suggested = Math.max(0.05, round(stats.high_rework.mean_ambiguity - 0.02));
+    recommendation = `自评偏乐观：高返工任务的歧义分平均 ${stats.high_rework.mean_ambiguity}，当时都过了门却平均返工 3+ 圈。建议此类任务门槛收紧为 ${suggested}（下次 clarify 时传 threshold: ${suggested}），并把本建议记入 learnings。`;
+  } else {
+    recommendation = '高返工任务的歧义分本就超标（>0.2）——问题不在门槛在执行：检查是否存在未过门就动工的情况。';
+  }
+  out({ gate: 'calibrate', ...stats, recommendation });
+} else if (args.mode === 'evidence') {
+  // Standalone-only helper: actually run the checks and emit a ready-made
+  // `checks` array for mode:"receipt". Commands run with your shell privileges —
+  // pass only commands you would run yourself.
+  const { spawnSync } = await import('node:child_process');
+  const cmds = args.commands;
+  if (!Array.isArray(cmds) || cmds.length < 1 || cmds.length > 8 || cmds.some((c) =>
+    !c || typeof c.cmd !== 'string' || !['target', 'regression', 'other'].includes(c.scope))) {
+    fail('evidence 模式需要 commands(1–8 项,每项 {cmd: "shell 命令", scope: target|regression|other})');
+  }
+  const checks = [];
+  for (const c of cmds) {
+    const started = Date.now();
+    const r = spawnSync(c.cmd, { shell: true, encoding: 'utf8', timeout: 600000 });
+    const outText = `${r.stdout ?? ''}${r.stderr ?? ''}`;
+    checks.push({
+      name: c.cmd,
+      exit_code: r.status ?? 1,
+      fresh: true,
+      scope: c.scope,
+      duration_ms: Date.now() - started,
+      tail: outText.split('\n').slice(-15).join('\n').trim()
+    });
+  }
+  out({
+    gate: 'evidence',
+    checks,
+    next: '把 checks（可去掉 tail/duration_ms）连同 uncovered 一起传给 mode:"receipt" 定级；tail 中的关键行贴进对话作为证据。'
+  });
 } else {
-  fail('mode 必须是 "ambiguity"、"drift" 或 "loop"');
+  fail('mode 必须是 "ambiguity"、"drift"、"loop"、"receipt"、"calibrate" 或 "evidence"');
 }

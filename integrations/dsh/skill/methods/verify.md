@@ -13,6 +13,7 @@ Ouroboros 用"机械 → 语义 → 多模型共识"三段门控制评估成本�
 - **读完整输出**，不是只看退出码——警告、跳过的用例、慢化的步骤都是信号。
 - 证据必须**新鲜**：本轮改动之后跑出来的才算；改动前的绿灯不能复用。
 - 任何一项红 → 不进下一门，回 `build`（bug 走系统化调试）。
+- 本技能的脚本可代跑并汇总：`node scripts/gate.mjs '{ mode: "evidence", commands: [{ cmd: "npm test", scope: "target" }, { cmd: "npm run lint", scope: "other" }] }'`，输出可直接喂给 receipt 定级。
 
 ### Gate 2 · 语义门（L1 及以上）
 
@@ -48,7 +49,7 @@ Drift = Σ(drift_i × weight_i)      门槛：≤ 0.3
 ```
 
 每维分数写一行依据，然后用随包脚本做确定性计算（不要心算）：
-`node scripts/gate.mjs '{ mode: "drift", goal: 0.1, constraints: 0, ontology: 0.2 }'`（脚本在本技能目录下；无 node 时按上方公式手算，并把每一步算式写在回复里）
+`node scripts/gate.mjs '{ mode: "drift", goal: 0.1, constraints: 0, ontology: 0.2 }'`（脚本在本技能目录下；无 node 时按公式/规则手算，并把每一步写在回复里）
 **Drift > 0.3 → 停止宣称**，二选一：回 `clarify` 走 reseed（需求确实变了，让用户裁定），或回滚越界部分。
 
 ## 证据收据（源自 Aegis，简化版）
@@ -67,11 +68,16 @@ Helix 收据:
 - 下一个最有价值的验证: <如果用户想更放心，该跑什么>
 ```
 
-置信分级：
+置信分级**由工具确定性判定，不许手定等级**——你只提供原始事实（跑了什么、退出码、是否新鲜、覆盖域、未覆盖面）：
 
-- **A**：直接目标证据 + 相关回归证据，无重大未知。
-- **B**：直接目标证据齐全，残余风险有界且已列出。
-- **C**：证据只覆盖一部分。**置信 C 不得宣称"完成"**——改说"实现了 X，尚未验证 Y"。
+`node scripts/gate.mjs '{ mode: "receipt", checks: [{ name: "npm test", exit_code: 0, fresh: true, scope: "target" }, { name: "npm run lint", exit_code: 0, fresh: true, scope: "other" }], uncovered: ["未验证并发场景"] }'`（脚本在本技能目录下；无 node 时按公式/规则手算，并把每一步写在回复里）
+
+判定规则（工具内置）：
+
+- **A**：全部通过且新鲜 + 有 target 证据 + 有 regression 证据 + 无已知未覆盖面。
+- **B**：全部通过且新鲜 + 有 target 证据，但缺回归证据或存在已列出的未覆盖面。
+- **C**：任一检查失败/不新鲜，或没有直接针对目标的证据。**置信 C 不得宣称"完成"**——改说"实现了 X，尚未验证 Y"。
+- 谎报 `fresh` 或漏报 `uncovered` 等于骗过自己的门——原始事实必须与对话中贴出的输出一致。
 
 ## 完成边界
 

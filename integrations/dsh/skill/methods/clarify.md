@@ -40,7 +40,7 @@ Ambiguity = 1 − Σ(clarity_i × weight_i)
 ```
 
 各维依据写好后，用随包脚本做确定性计算（不要心算）：
-`node scripts/gate.mjs '{ mode: "ambiguity", goal: 0.9, constraints: 0.7, success: 0.8, brownfield: true, context: 0.85 }'`（脚本在本技能目录下；无 node 时按上方公式手算，并把每一步算式写在回复里）
+`node scripts/gate.mjs '{ mode: "ambiguity", goal: 0.9, constraints: 0.7, success: 0.8, brownfield: true, context: 0.85 }'`（脚本在本技能目录下；无 node 时按公式/规则手算，并把每一步写在回复里）
 
 **门槛：Ambiguity ≤ 0.2 才可结晶 Seed。** 超过就回去继续访谈/查证，优先补加权贡献最低的维度。
 
@@ -50,7 +50,7 @@ Ambiguity = 1 − Σ(clarity_i × weight_i)
 
 ## 第三步：结晶 Seed（不可变规格）
 
-过门后把共识结晶成 Seed。格式：
+过门后把共识结晶成 Seed。**快速起步**：bugfix / feature / refactor / migration 四类任务有预填模板，读 `methods/templates.md` 取用（填空 + 删不适用项，占位必须填实）。通用格式：
 
 ```markdown
 # Seed: <任务名>            （版本: seed-N，日期）

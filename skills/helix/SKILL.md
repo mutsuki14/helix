@@ -65,6 +65,7 @@ Helix 是一套工程方法环，融合两条血统，并以第三方生态之�
 |---|---|---|
 | `personas.md` | 九人格 + 派发即用提示词 + 无子代理回退协议 | 派评审/脱困/访谈子代理前 |
 | `clarify.md` | 苏格拉底访谈、歧义门、Seed 结晶 | L2 开工前；`helix seed` |
+| `templates.md` | Seed 模板库（bugfix/feature/refactor/migration） | 结晶 Seed 时快速起步 |
 | `grill.md` | 压力测试协议 + 文档评审提示词 | `helix grill`、审问计划 |
 | `brownfield.md` | 棕地考古四步 + 术语表 | 已有代码库上的 L2 且 context 不清 |
 | `build.md` | 基线优先、TDD 路由、调试五步、派发原则 | 每个 L1/L2 执行前；遇 bug |
@@ -95,7 +96,7 @@ Helix 是一套工程方法环，融合两条血统，并以第三方生态之�
 ## 文件必要性门（Doc Necessity Gate）
 
 - **L0/L1 一律不创建文件**；迷你 Seed 与评估结论只出现在回复里。
-- 仅 **L2 且（跨会话 / 需审批 / 多圈）** 创建 `.helix/`：`seed.md`（不可变，reseed 归档旧版）、`plan.md`、`journal.md`（append-only）、`decisions.md`、`learnings.md`。项目已有 ADR/文档体系时并入项目的，不另立。
+- 仅 **L2 且（跨会话 / 需审批 / 多圈）** 创建 `.helix/`：`seed.md`（不可变，reseed 归档旧版）、`plan.md`、`journal.md`（append-only）、`decisions.md`、`learnings.md`、`calibration.jsonl`（校准账本）。项目已有 ADR/文档体系时并入项目的，不另立。
 - 机械性改动不写文档：commit message 与代码即记录。
 
 ## 快路径守则（所有级别通用）
