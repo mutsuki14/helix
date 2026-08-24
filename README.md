@@ -66,7 +66,23 @@ verification before claiming done, non-converging iterations), read and follow
 
 ## Use
 
-Just assign engineering work — the skill triggers on its description. Explicit commands: `helix: <task>`, `helix seed`, `helix grill` (pressure-test a plan), `helix plan`, `helix review`, `helix unstuck`, `helix status`, `helix retro`, `helix adr`.
+Just assign engineering work — the skill triggers on its description.
+
+### Explicit commands explained
+
+Commands are shortcuts: without them, the agent still auto-triages engineering tasks by risk; natural-language equivalents ("grill this plan", "I'm stuck") trigger the same routes. Inside Cindy, invoke with the `$helix` prefix.
+
+| Command | What it does | When to use | What you get |
+|---|---|---|---|
+| `helix: <task>` | Enter the loop explicitly: L0/L1/L2 triage first, then fast path / mini loop / full loop | You want a task done under full discipline | Triage verdict + the corresponding workflow |
+| `helix seed` | Clarify only, no execution: Socratic interview + ambiguity gate (must be ≤0.2), then crystallize an immutable Seed spec | Requirements still vague; align before deciding to build | Seed: goal / non-goals / constraints / verifiable acceptance criteria / ontology / stop conditions |
+| `helix grill` | Pressure-test an existing plan/design from a "try to refute" stance, one question at a time: weakest assumptions, discarded alternatives, blast radius | Before committing to a plan; reviewing someone else's design | Verdict: what survived + fixes + residual risks |
+| `helix plan` | Slice a crystallized Seed into an executable plan: 2–15-minute tasks with exact file paths and verification steps; batches are safe checkpoints | Cross-session work, batch approvals, multiple implementers | A `.helix/plan.md` plan document |
+| `helix review` | Dispatch an independent reviewer (not the implementer) for production readiness: correctness / contracts / ownership / complexity / tests / security | Before merging; after high-risk changes | Findings ranked critical/major/minor; critical blocks the merge |
+| `helix unstuck` | Stall diagnosis (spinning / oscillation / no progress / diminishing returns) + five-lens escape: simplifier, hacker, dissenter, architect, researcher | Same bug won't die, iterations not converging, out of ideas | Five distinct ways out + the chosen new path |
+| `helix status` | Report from the `.helix/journal.md` ledger: AC pass state, current loop, verified facts, next step | Resuming a long task in a new session; checking progress | A current-loop status summary |
+| `helix retro` | Four-question retrospective: prediction misses, rework root cause, reusable tactics, project landmines; worthwhile lessons are recorded | After finishing an L2 task; after a costly failure | New entries in `.helix/learnings.md` (re-read at the next task's start) |
+| `helix adr` | Record an architecture decision: context / decision / rejected options / re-review trigger | Whenever a decision changes architecture, contracts, or tech choices | A new entry in `.helix/decisions.md` (or the project's own ADR home) |
 
 Gate math is deterministic and auditable:
 
