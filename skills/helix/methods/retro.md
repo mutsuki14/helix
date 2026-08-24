@@ -36,14 +36,14 @@
 每次 L2 任务 retro 时，往 `.helix/calibration.jsonl` **追加一行**（没有就创建）：
 
 ```json
-{"t":"2026-08-24","task":"任务一句话","ambiguity":0.18,"loops":3,"drift":0.1}
+{"t":"2026-08-24","task":"任务一句话","ambiguity":0.18,"loops":3,"drift":0.1,"level_initial":"L1","level_final":"L2"}
 ```
 
-字段：`ambiguity`=当时歧义门得分；`loops`=实际用掉的圈数；`drift`=最终漂移分（可省）。
+字段：`ambiguity`=当时歧义门得分；`loops`=实际用掉的圈数；`drift`=最终漂移分（可省）；`level_initial`/`level_final`=初判级别与实际走完的级别（可省）——两者不同即分级误判，calibrate 会统计误判率与方向。
 
 积累 ≥5 条后，每次 retro 顺手跑一次校准统计——读出全部记录传给工具：
 
-`node scripts/gate.mjs '{ mode: "calibrate", records: [/* calibration.jsonl 全部行 */] }'`（脚本在本技能目录下；无 node 时按公式/规则手算，并把每一步写在回复里）
+`node scripts/gate.mjs '{ mode: "calibrate", records: [/* calibration.jsonl 全部行 */] }'`（脚本在本技能目录下；无 node 时按规则手算并展示判定过程）
 
 工具会对比高返工任务（≥3 圈）与低返工任务的歧义分：若高返工任务当时都"过了门"，说明自评系统性乐观，工具会给出收紧后的建议门槛——把它记入 `.helix/learnings.md`，下个任务 clarify 时作为 `threshold` 参数生效。这条闭环是 Helix 独有的：门槛不是拍出来的常数，是被你自己的返工数据校准出来的。
 

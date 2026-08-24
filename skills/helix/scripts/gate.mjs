@@ -161,6 +161,36 @@ if (args.mode === 'ambiguity') {
       ? '置信 C：不得宣称"完成"——改说"实现了 X，尚未验证 Y"，或补齐检查后重新评级。'
       : `置信 ${grade}：可以宣称完成${grade === 'B' ? '，但收据必须列出残余风险' : ''}。等级由工具按原始事实判定，不要手改。`
   });
+} else if (args.mode === 'triage') {
+  const bools = ['cross_module', 'contract_change', 'shared_code', 'cross_session', 'high_risk', 'multi_step'];
+  for (const b of bools) {
+    if (typeof args[b] !== 'boolean') fail(`triage 模式七个信号全部必填（强迫逐项过脑）：缺 "${b}"(boolean)`);
+  }
+  const amb = args.ambiguity_guess;
+  if (typeof amb !== 'number' || amb < 0 || amb > 1) fail('triage 模式缺 "ambiguity_guess"(0–1 数字，粗估即可)');
+  const reasons = [];
+  if (args.contract_change) reasons.push('契约/schema 变更');
+  if (args.cross_module) reasons.push('跨模块');
+  if (args.cross_session) reasons.push('跨会话');
+  if (args.high_risk) reasons.push('高风险面（数据/安全/不可逆）');
+  if (amb > 0.4) reasons.push(`歧义粗估 ${amb} > 0.4`);
+  let level;
+  if (reasons.length) {
+    level = 'L2';
+  } else if (args.multi_step || args.shared_code || amb > 0.1) {
+    level = 'L1';
+    if (args.shared_code) reasons.push('共享代码（红线：不得 L0）');
+    if (args.multi_step) reasons.push('多步实现');
+    if (amb > 0.1) reasons.push(`歧义粗估 ${amb} > 0.1`);
+  } else {
+    level = 'L0';
+    reasons.push('单步、低风险、意图明确');
+  }
+  out({
+    gate: 'triage', level, reasons,
+    route_line: level === 'L0' ? '（L0 保持隐形，不写 Route line）' : `Route: ${level} ${level === 'L1' ? '迷你环' : '完整环'}（${reasons[0]}）`,
+    note: '把本次初判记入校准账本（level_initial），任务结束时补 level_final——calibrate 会统计误判率。'
+  });
 } else if (args.mode === 'calibrate') {
   const records = args.records;
   if (!Array.isArray(records) || records.some((r) =>
@@ -173,14 +203,23 @@ if (args.mode === 'ambiguity') {
   const high = records.filter((r) => r.loops >= 3);
   const low = records.filter((r) => r.loops <= 1);
   const drifts = records.map((r) => r.drift).filter((d) => typeof d === 'number');
+  const LV = ['L0', 'L1', 'L2'];
+  const leveled = records.filter((r) => LV.includes(r.level_initial) && LV.includes(r.level_final));
+  const under = leveled.filter((r) => LV.indexOf(r.level_initial) < LV.indexOf(r.level_final)).length;
+  const over = leveled.filter((r) => LV.indexOf(r.level_initial) > LV.indexOf(r.level_final)).length;
   const stats = {
     n,
     high_rework: { count: high.length, mean_ambiguity: mean(high.map((r) => r.ambiguity)) },
     low_rework: { count: low.length, mean_ambiguity: mean(low.map((r) => r.ambiguity)) },
-    mean_drift: mean(drifts)
+    mean_drift: mean(drifts),
+    triage: leveled.length
+      ? { with_levels: leveled.length, misjudged: under + over, under_triaged: under, over_triaged: over }
+      : null
   };
   let recommendation;
-  if (n < 5) {
+  if (stats.triage && stats.triage.with_levels >= 5 && stats.triage.under_triaged / stats.triage.with_levels > 0.3) {
+    recommendation = `分级系统性偏低：${stats.triage.with_levels} 条带级别记录中 ${stats.triage.under_triaged} 条初判偏低（干着干着升级）。红线执行不严——L1 判定时更积极使用 triage 模式并核实 shared_code/契约信号。`;
+  } else if (n < 5) {
     recommendation = `样本不足（${n}/5）：继续在每次 retro 时追加校准记录，暂不调门槛。`;
   } else if (high.length < 3) {
     recommendation = '高返工（≥3 圈）样本不足 3 条：当前歧义门表现尚可，维持默认门槛。';
