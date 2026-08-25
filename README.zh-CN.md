@@ -16,7 +16,7 @@ Helix 融合三条血统的长处并补齐它们的缺口：
 
 ## 安装
 
-技能就是一个文件夹：`skills/helix`（路由 `SKILL.md` + 14 份方法文件 + `scripts/gate.mjs`）。
+技能就是一个文件夹：`skills/helix`（路由 `SKILL.md` + 17 份方法文件 + `scripts/gate.mjs`）。
 
 **Claude Code（插件市场）**
 
@@ -95,9 +95,8 @@ node skills/helix/scripts/gate.mjs '{ mode: "loop", ac_total: 6, ac_passed_histo
 ```
 skills/helix/
   SKILL.md            路由：L0/L1/L2 分级、努力度阶梯、口令表、文件索引
-  methods/            clarify / grill / brownfield / build / plan / tdd / debugging
-                      / subagents / git / verify / review / evolve / retro / personas
-  scripts/gate.mjs    歧义 / 漂移 / 循环三种门的计算器（零依赖）
+  methods/            17 份方法文件 —— 完整索引见 SKILL.md
+  scripts/gate.mjs    7 种确定性模式：歧义 / 漂移 / 循环 / 收据 / 校准 / 分级 / 取证（零依赖）
 ```
 
 ## 血统与许可

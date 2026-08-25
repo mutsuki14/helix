@@ -1,8 +1,13 @@
 #!/usr/bin/env node
 // Helix quantitative gate calculator (portable, zero-dependency).
 // Usage: node gate.mjs '{ mode: "ambiguity", goal: 0.9, constraints: 0.7, success: 0.8 }'
-// Modes: ambiguity (threshold ≤0.2) | drift (≤0.3) | loop (convergence/stall ruling).
-// Same semantics as the Cindy plugin's helix_gate tool.
+// Modes: ambiguity (≤0.2) | drift (≤0.3) | loop (convergence/stall ruling)
+//        | receipt (confidence A/B/C) | calibrate (self-score stats)
+//        | triage (L0/L1/L2) | evidence (run checks — standalone-only).
+// Same semantics as the Cindy plugin's helix_gate tool, except `evidence`,
+// which is standalone-only (the Cindy sandbox cannot spawn shell commands).
+
+const MODES = ['ambiguity', 'drift', 'loop', 'receipt', 'calibrate', 'triage', 'evidence'];
 
 const GATES = {
   ambiguity: {
@@ -134,7 +139,12 @@ if (args.mode === 'ambiguity') {
     typeof c.fresh !== 'boolean' || !okScopes.includes(c.scope))) {
     fail('receipt 模式需要 checks(非空数组,每项 {name, exit_code, fresh, scope: target|regression|other})');
   }
-  const uncovered = Array.isArray(args.uncovered) ? args.uncovered.filter((u) => typeof u === 'string') : [];
+  // uncovered 必须显式是字符串数组：传成单个字符串曾被静默丢弃，把本该 B 的评级抬到 A。
+  if (args.uncovered !== undefined &&
+      (!Array.isArray(args.uncovered) || args.uncovered.some((u) => typeof u !== 'string'))) {
+    fail('receipt 模式的 uncovered 必须是字符串数组（只有一条也要写成 ["..."]）——传字符串或混入非字符串会被当作"无未覆盖面"错误抬高评级');
+  }
+  const uncovered = args.uncovered ?? [];
   const failed = checks.filter((c) => c.exit_code !== 0).map((c) => c.name);
   const stale = checks.filter((c) => c.fresh !== true).map((c) => c.name);
   const hasTarget = checks.some((c) => c.scope === 'target' && c.exit_code === 0 && c.fresh === true);
@@ -241,24 +251,41 @@ if (args.mode === 'ambiguity') {
     fail('evidence 模式需要 commands(1–8 项,每项 {cmd: "shell 命令", scope: target|regression|other})');
   }
   const checks = [];
+  let anyIncomplete = false;
+  const TAIL_LINES = 15;
+  const TAIL_CHARS = 2000;
   for (const c of cmds) {
     const started = Date.now();
-    const r = spawnSync(c.cmd, { shell: true, encoding: 'utf8', timeout: 600000 });
+    // maxBuffer 放宽到 32MB：默认 1MB 会让啰嗦但通过的测试被杀进程、status 变 null、误报成失败。
+    const r = spawnSync(c.cmd, { shell: true, encoding: 'utf8', timeout: 600000, maxBuffer: 32 * 1024 * 1024 });
     const outText = `${r.stdout ?? ''}${r.stderr ?? ''}`;
+    // tail 先截行再截字符：单行超长输出（minified/长堆栈/带 \r 的进度条）否则会把上百万字符灌进上下文。
+    let tail = outText.split('\n').slice(-TAIL_LINES).join('\n').trim();
+    if (tail.length > TAIL_CHARS) tail = `…[前段已截断，仅留末 ${TAIL_CHARS} 字符]…\n` + tail.slice(-TAIL_CHARS);
+    // 进程被杀时拿不到真实退出码：按失败计（fail-closed），但必须显式标注原因，不许伪装成普通失败。
+    const incomplete = r.error
+      ? (r.error.code === 'ETIMEDOUT' ? 'timed-out(600s)'
+        : r.error.code === 'ENOBUFS' ? 'output-overflow(>32MB)'
+        : String(r.error.code || r.error.message).slice(0, 60))
+      : (typeof r.status !== 'number' ? `killed-by-signal(${r.signal ?? 'unknown'})` : null);
+    if (incomplete) anyIncomplete = true;
     checks.push({
       name: c.cmd,
-      exit_code: r.status ?? 1,
+      exit_code: typeof r.status === 'number' ? r.status : 1,
       fresh: true,
       scope: c.scope,
       duration_ms: Date.now() - started,
-      tail: outText.split('\n').slice(-15).join('\n').trim()
+      output_chars: outText.length,
+      ...(incomplete ? { incomplete } : {}),
+      tail
     });
   }
   out({
     gate: 'evidence',
     checks,
-    next: '把 checks（可去掉 tail/duration_ms）连同 uncovered 一起传给 mode:"receipt" 定级；tail 中的关键行贴进对话作为证据。'
+    ...(anyIncomplete ? { warning: '有检查带 incomplete 标记：进程被杀，exit_code=1 是 fail-closed 的占位值而非真实退出码。不要把它当作"测试真的失败了"——缩小输出（重定向到文件后只读摘要）或提高超时后重跑。' } : {}),
+    next: '把 checks（去掉 tail/duration_ms/output_chars）连同 uncovered 一起传给 mode:"receipt" 定级；tail 中的关键行贴进对话作为证据。带 incomplete 的检查先重跑，不要直接拿去定级。'
   });
 } else {
-  fail('mode 必须是 "ambiguity"、"drift"、"loop"、"receipt"、"calibrate" 或 "evidence"');
+  fail(`mode 必须是 ${MODES.map((m) => `"${m}"`).join('、')}`);
 }

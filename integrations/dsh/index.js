@@ -27,7 +27,13 @@ export async function apply() {
         return;
       }
       const installed = (await readFile(markerPath, 'utf8')).trim();
-      if (installed === pkg.version) return; // already current
+      // 版本号一致还不够：拷贝中断或用户误删单个文件会留下半损副本，
+      // 只查 marker 会让残缺状态被永久保留。所以同时校验关键结构完整。
+      const intact = existsSync(join(target, 'SKILL.md')) &&
+        existsSync(join(target, 'methods')) &&
+        existsSync(join(target, 'scripts'));
+      if (installed === pkg.version && intact) return; // already current and complete
+      if (!intact) console.log('[dsh-helix] existing copy is incomplete; repairing.');
       await rm(target, { recursive: true, force: true });
     }
     await mkdir(dirname(target), { recursive: true });

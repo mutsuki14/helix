@@ -15,4 +15,4 @@ Helix 以三种形态分发，**任何内容更新必须三处同步**，版本�
 - `ghost_call({ ..., tool: "helix_gate", args: ... })` → `node scripts/gate.mjs '<args>'`
 - 门槛/裁决逻辑改动必须**双端同改**（插件 `main.js` 与本仓库 `gate.mjs`）并各自跑测试用例
 
-English summary: Helix ships in three forms (Cindy plugin, this cross-host skill pack, installed instances). Every content update must sync all of them with matching version numbers; gate-logic changes must land in both `main.js` (plugin) and `scripts/gate.mjs` (here), each with tests.
+English summary: Helix ships in four forms (Cindy plugin, this cross-host skill pack, the bundled dsh plugin under `integrations/dsh`, and installed instances). Every content update must sync all of them with matching version numbers; gate-logic changes must land in both `main.js` (plugin) and `scripts/gate.mjs` (here), each with tests.

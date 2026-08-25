@@ -16,7 +16,7 @@ The result is a spiral: the loop closes, but every turn must rise with evidence.
 
 ## Install
 
-The skill is one folder: `skills/helix` (router `SKILL.md` + 14 method files + `scripts/gate.mjs`).
+The skill is one folder: `skills/helix` (router `SKILL.md` + 17 method files + `scripts/gate.mjs`).
 
 **Claude Code (plugin marketplace)**
 
@@ -96,9 +96,9 @@ node skills/helix/scripts/gate.mjs '{ mode: "loop", ac_total: 6, ac_passed_histo
 ```
 skills/helix/
   SKILL.md            router: L0/L1/L2 triage, effort ladder, command table, file index
-  methods/            clarify, grill, brownfield, build, plan, tdd, debugging,
-                      subagents, git, verify, review, evolve, retro, personas
-  scripts/gate.mjs    ambiguity / drift / loop gate calculator (zero-dependency)
+  methods/            17 files — full index in SKILL.md
+  scripts/gate.mjs    7 deterministic modes: ambiguity / drift / loop / receipt
+                      / calibrate / triage / evidence (zero-dependency)
 ```
 
 Method files are currently written in Chinese; agents handle them natively. English translations welcome via PR.

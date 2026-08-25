@@ -1,6 +1,6 @@
 ---
 name: helix
-description: "Use for disciplined coding and engineering work: clarifying vague requirements, specs and acceptance criteria, baseline-first edits, root-cause debugging, evidence before claiming done, non-converging iterations, getting unstuck, long cross-session tasks, ADRs, retiring legacy code. Also on keywords: helix, seed, grill, unstuck. 工程任务需要纪律时加载：澄清需求、出规格、修 bug 找根因、完成前验证、迭代不收敛、脱困、长任务续航。"
+description: "Use for disciplined coding and engineering work: clarifying vague requirements, specs and acceptance criteria, implementation plans, baseline-first edits, root-cause debugging, evidence before claiming done, independent code review, non-converging iterations, getting unstuck, checking task progress, long cross-session tasks, retrospectives, ADRs, retiring legacy code. Also on keywords: helix, seed, grill, plan, review, unstuck, status, retro, adr. 工程任务需要纪律时加载：澄清需求、出规格、写计划、修 bug 找根因、完成前验证、请人评审、迭代不收敛、脱困、查进展、长任务续航、复盘、记录架构决策。"
 ---
 
 # Helix 方法环 · 总路由
@@ -52,9 +52,9 @@ Helix 是一套工程方法环，融合两条血统，并以第三方生态之�
 进程深度与子代理用量按风险配给，且随实际表现升降档：
 
 - 初始档：L0 无子代理；L1 至多 1 个；L2 按需——共识门默认 2 人格，契约/数据/安全面 3 人格。
-- **升档**：某道门失败一次 → 该环节下一轮加深；出现停滞信号 → 直接进脱困。
-- **降档**：连续两圈干净通过 → 收回多余仪式。
-- 上不封顶下有底线：无论怎么降档，机械门与证据收据不可省。
+- **升档**：某道门失败一次 → 该环节下一轮加深（更全的重读、多一个评审人格、更细的复现）；出现停滞信号 → 直接进脱困。
+- **降档**：连续两圈干净通过 → 收回多余仪式（评审回到 2 人格、跳过可选深读）。
+- 上不封顶下有底线：无论怎么降档，Gate 1 机械门与证据收据不可省。
 
 ## 方法环总览（L2）
 
