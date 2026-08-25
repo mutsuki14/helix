@@ -7,7 +7,7 @@
 
 大多数任务肉眼可判级，**不要每次都调工具**。只在 L1/L2 之间拿不准、或用户质疑分级时使用：
 
-`node scripts/gate.mjs '{ mode: "triage", cross_module: false, contract_change: false, shared_code: true, cross_session: false, high_risk: false, multi_step: true, ambiguity_guess: 0.2 }'`（脚本在本技能目录下；无 node 时按规则手算并展示判定过程）
+`node scripts/gate.mjs '{ mode: "triage", cross_module: false, contract_change: false, shared_code: true, cross_session: false, high_risk: false, multi_step: true, ambiguity_guess: 0.2 }'`（脚本在本技能目录下；无 node 时按公式/规则手算，并把每一步写在回复里）
 
 七个信号全部必填（强迫逐项过脑）。判定规则（工具内置）：契约变更 / 跨模块 / 跨会话 / 高风险（数据、安全、不可逆）/ 歧义 > 0.4 任一命中 → L2；多步 / 共享代码 / 歧义 > 0.1 → L1；全无 → L0。共享代码永远到不了 L0（红线内置）。
 

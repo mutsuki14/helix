@@ -2,7 +2,6 @@
 name: helix
 description: "Use for disciplined coding and engineering work: clarifying vague requirements, specs and acceptance criteria, implementation plans, baseline-first edits, root-cause debugging, evidence before claiming done, independent code review, non-converging iterations, getting unstuck, checking task progress, long cross-session tasks, retrospectives, ADRs, retiring legacy code. Also on keywords: helix, seed, grill, plan, review, unstuck, status, retro, adr. 工程任务需要纪律时加载：澄清需求、出规格、写计划、修 bug 找根因、完成前验证、请人评审、迭代不收敛、脱困、查进展、长任务续航、复盘、记录架构决策。"
 ---
-
 # Helix 方法环 · 总路由
 
 > 若当前宿主是 Cindy 且已装入 `helix` 插件（工具列表里有 `ghost_call`，且花名册有 helix），优先使用插件（`ghost_manual` / `helix_gate` 工具），本技能是它的跨宿主等价物，不要两边重复走流程。
@@ -39,7 +38,7 @@ Helix 是一套工程方法环，融合两条血统，并以第三方生态之�
 |---|---|---|
 | **L0 琐碎** | 问答、状态查询、单命令检查、微小低风险编辑 | **快路径**：直接做，不进环、不写文件、不提 Helix。完成时一句话说清"做了什么检查、结果如何"。 |
 | **L1 中等** | 单模块、验收明确、无契约变更，但需多步实现 | **迷你环**：3 行迷你 Seed（写在回复里）→ 执行 → 机械+语义两级评估。 |
-| **L2 复杂** | 跨模块、契约/schema/数据边界变更、需求含糊、高风险、跨会话 | **完整环**：`methods/clarify.md` → `methods/build.md` → `methods/verify.md` → `methods/evolve.md`。 |
+| **L2 复杂** | 跨模块、契约/schema/数据边界变更、需求含糊、高风险、跨会话 | **完整环**：`clarify` → `build` → `verify` → `evolve`。 |
 
 红线：共享代码、核心路径、契约、跨模块工作**没有证据不得判 L0**。拿不准就升级；L1/L2 之间拿不准可用 gate 脚本的 `triage` 模式取确定性裁决（用法见 `methods/routing.md`，不要每次都调）。
 
@@ -49,7 +48,7 @@ Helix 是一套工程方法环，融合两条血统，并以第三方生态之�
 
 ## 努力度阶梯（成本感知路由）
 
-进程深度与子代理用量按风险配给，且随实际表现升降档：
+进程深度与子代理用量按风险配给，且**随实际表现升降档**：
 
 - 初始档：L0 无子代理；L1 至多 1 个；L2 按需——共识门默认 2 人格，契约/数据/安全面 3 人格。
 - **升档**：某道门失败一次 → 该环节下一轮加深（更全的重读、多一个评审人格、更细的复现）；出现停滞信号 → 直接进脱困。
@@ -94,6 +93,8 @@ Helix 是一套工程方法环，融合两条血统，并以第三方生态之�
 | `review.md` | 评审请求提示词 + 接收评审纪律 | `helix review`、处理评审反馈 |
 | `evolve.md` | 循环裁决、脱困、journal、ADR、反熵 | 验证未全过；卡住；跨会话 |
 | `retro.md` | 复盘四问 + 学习账本 | `helix retro`；环收敛后 |
+
+读取方式：直接读本技能目录 `methods/` 下的对应文件。
 
 ## 口令表
 

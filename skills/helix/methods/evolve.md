@@ -17,7 +17,7 @@
 **上升法则**：每一圈必须满足其一——多通过至少一条 AC，或产生记入账本的新知识（如"方案 A 被证伪，因为 X"）。
 
 **循环裁决用工具算，不靠感觉**。每圈评估后调用：
-`node scripts/gate.mjs '{ mode: "loop", ac_total: 6, ac_passed_history: [2, 4, 4], repeated_same_error: false, oscillation: false }'`（脚本在本技能目录下；无 node 时按上方公式手算，并把每一步算式写在回复里）
+`node scripts/gate.mjs '{ mode: "loop", ac_total: 6, ac_passed_history: [2, 4, 4], repeated_same_error: false, oscillation: false }'`（脚本在本技能目录下；无 node 时按公式/规则手算，并把每一步写在回复里）
 返回四种裁决：`converged`（全过，走漂移门+反熵清退后收据离场）/ `continue`（有上升，写失败分析进下一圈）/ `unstuck`（停滞，先脱困）/ `cap-reached`（到硬上限）。
 
 **硬圈数上限：同一 Seed 默认 5 圈。** 到限即停，向用户汇报：已通过/未通过的 AC、每圈失败分析摘要、三个选项（缩小范围 reseed / 接受部分完成 / 换根本方案）。上限防无限空转——这是 Ouroboros 硬代数上限在 Agent 场景的等价物。
