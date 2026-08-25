@@ -1,0 +1,4 @@
+# Generated artifacts are compared with diff during maintenance; mixed line
+# endings made every file look fully changed and hid real content drift.
+* text=auto eol=lf
+*.png binary

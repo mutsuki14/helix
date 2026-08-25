@@ -14,14 +14,15 @@ skills/helix/       ──sync-dsh────> integrations/dsh/skill/
 ## 改动后必跑（顺序固定）
 
 ```bash
-node scripts/build-gates.mjs     # 门逻辑改动后（改的是 source/，不是产物）
-node scripts/build-skill.mjs     # 手册改动后（改的是插件 manual/，不是 methods/）
-node scripts/sync-dsh.mjs        # 上面任一步之后
-node scripts/test-gates.mjs      # 50 条夹具跑两端，必须全绿
+node scripts/verify-all.mjs      # 一条命令跑完整链：build-gates → build-skill --check
+                                 # → sync-dsh → test-gates(50 夹具双端)
+                                 # → fuzz-gates(2 万随机输入+关键分支覆盖守卫)
+                                 # → audit-manuals(手册引用/索引/口令/模式自洽)
 ```
 
-`node scripts/build-skill.mjs --check` 只校验不写盘，用于提交前确认技能包与插件源同步。
-脚本默认插件目录为 `../helix`，可传参覆盖：`node scripts/build-gates.mjs /path/to/plugin`。
+单步脚本也可独立运行（build-gates / build-skill / sync-dsh / test-gates / fuzz-gates / audit-manuals）。
+`build-skill.mjs --check` 只校验不写盘；`fuzz-gates.mjs 200000 --coverage` 可放大规模并打印分支覆盖。
+脚本默认插件目录为 `../helix`，可传参覆盖：`node scripts/verify-all.mjs /path/to/plugin`。
 
 ## 版本号（四处必须一致）
 
